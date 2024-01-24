@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CurseDeliverer
@@ -49,7 +50,7 @@ namespace CurseDeliverer
             var form = new MotorSelectAndCheck.MotorCalculationForm();
             form.labelPras.Text = Pras.ToString();
 
-            //исправить это всё
+            //возможно перенести
             var motors = MotorReader.Read();
             foreach ( var m in motors.Where(x => x.P2nom > Pras))
             {
@@ -71,6 +72,7 @@ namespace CurseDeliverer
                 d["{J}"] = m.J.ToString();
                 d["{m}"] = m.m.ToString();
 
+
                 //Проверка на перегрузочную способность
                 var Mnom = m.P2nom * 1000 / (157 * (1 - (m.sN / 100)));
                 d["{Mnom}"] = Mnom.ToString();
@@ -89,8 +91,143 @@ namespace CurseDeliverer
                 if (m.P2nom < 23)
                     continue;
 
-                //Проверка на нагрев
-                //
+                var kpd0 = m.kpd / 100;
+                d["{kpd0}"] = kpd0.ToString();
+                //Проверка на нагрев методом средних потерь
+                var dPnom = m.P2nom * (1 - kpd0) / kpd0;
+                d["{dPnom}"] = dPnom.ToString();
+                var match = Regex.Match(m.Type, @"4(AM|АМ)(\d+)[A-ZА-Я]").Groups[2];
+                var engineHeight = double.Parse(match.Value);
+                var Tdop = engineHeight < 150 ? 80 : 100;
+                d["{Tdop}"] = Tdop.ToString();
+                var TN = (6 * m.m * Tdop * kpd0) / (m.P2nom * 1000 * (1 - kpd0));
+                d["{TN}"] = TN.ToString();
+                var KT = 1 / (1 - Math.Pow(2.7, -tsum / TN));
+                d["{KT}"] = KT.ToString();
+
+                var x1 = v.P1 / m.P2nom;
+                d["{x1}"] = x1.ToString();
+                var x2 = v.P2 / m.P2nom;
+                d["{x2}"] = x2.ToString();
+                var x3 = v.P3 / m.P2nom;
+                d["{x3}"] = x3.ToString();
+                var x4 = v.P4 / m.P2nom;
+                d["{x4}"] = x4.ToString();
+                var kpd1 = 1 / (1 + Math.Pow((1 / (kpd0)) - 1, ((0.6 / x1) + x1) / (0.6 + 1)));
+                d["{kpd1}"] = kpd1.ToString();
+                var kpd2 = 1 / (1 + Math.Pow((1 / (kpd0)) - 1, ((0.6 / x2) + x2) / (0.6 + 1)));
+                d["{kpd2}"] = (kpd2.ToString());
+                var kpd3 = 1 / (1 + Math.Pow((1 / (kpd0)) - 1, ((0.6 / x3) + x3) / (0.6 + 1)));
+                d["{kpd3}"] = kpd3.ToString();
+                var kpd4 = 1 / (1 + Math.Pow((1 / (kpd0)) - 1, ((0.6 / x4) + x4) / (0.6 + 1)));
+                d["{kpd4}"] = kpd4.ToString();
+                var dP1 = v.P1 * (1 - kpd1) / kpd1;
+                d["{dP1}"] = dP1.ToString();
+                var dP2 = v.P2 * (1 - kpd2) / kpd2;
+                d["{dP2}"] = dP2.ToString();
+                var dP3 = v.P3 * (1 - kpd3) / kpd3;
+                d["{dP3}"] = dP3.ToString();
+                var dP4 = v.P4 * (1 - kpd4) / kpd4;
+                d["{dP4}"] = dP4.ToString();
+
+                var dPsred = (dP1 * v.t1 + dP2 * v.t2 + dP3 * v.t3 + dP4 * v.t4) / tsum;
+                d["{dPsred}"] = dPsred.ToString();
+                
+                if (dPnom < dPsred / KT)
+                    continue;
+
+
+                //Проверка на нагрев методом расчета температуры
+                var dPnomK = dPnom * 1000;
+                d["{dPnomK}"] = dPnomK.ToString();
+                var Ateplo = dPnomK / Tdop;
+                d["{Ateplo}"] = Ateplo.ToString();
+
+                var dP1K = dP1 * 1000;
+                d["{dP1K}"] = dP1K.ToString();
+                var dP2K = dP2 * 1000;
+                d["{dP2K}"] = dP2K.ToString();
+                var dP3K = dP3 * 1000;
+                d["{dP3K}"] = dP3K.ToString();
+                var dP4K = dP4 * 1000;
+                d["{dP4K}"] = dP4K.ToString();
+
+                var Tust1 = dP1K / Ateplo;
+                d["{Tust1}"] = Tust1.ToString();
+                var Tust2 = dP2K / Ateplo;
+                d["{Tust2}"] = Tust2.ToString();
+                var Tust3 = dP3K / Ateplo;
+                d["{Tust3}"] = Tust3.ToString();
+                var Tust4 = dP4K / Ateplo;
+                d["{Tust4}"] = Tust4.ToString();
+
+                var T1sr = Tust1 * (1 - Math.Pow(2.7, -v.t1 / (2 * TN)));
+                d["{T1sr}"] = T1sr.ToString();
+                var T1kon = Tust1 * (1 - Math.Pow(2.7, -v.t1 / TN));
+                d["{T1kon}"] = T1kon.ToString();
+
+                var T2sr = (Tust2 * (1 - Math.Pow(2.7, -v.t2 / (2 * TN)))) + (T1kon * Math.Pow(2.7, -v.t2 / (2 * TN)));
+                d["{T2sr}"] = T2sr.ToString();
+                var T2kon = (Tust2 * (1 - Math.Pow(2.7, -v.t2 / TN))) + (T1kon * Math.Pow(2.7, -v.t2 / TN));
+                d["{T2kon}"] = T2kon.ToString();
+
+                var T3sr = (Tust3 * (1 - Math.Pow(2.7, -v.t3 / (2 * TN)))) + (T2kon * Math.Pow(2.7, -v.t3 / (2 * TN)));
+                d["{T3sr}"] = T3sr.ToString();
+                var T3kon = (Tust3 * (1 - Math.Pow(2.7, -v.t3 / TN))) + (T2kon * Math.Pow(2.7, -v.t3 / TN));
+                d["{T3kon}"] = T3kon.ToString();
+
+                var T4sr = (Tust4 * (1 - Math.Pow(2.7, -v.t4 / (2 * TN)))) + (T3kon * Math.Pow(2.7, -v.t4 / (2 * TN)));
+                d["{T4sr}"] = T4sr.ToString();
+                var T4kon = (Tust4 * (1 - Math.Pow(2.7, -v.t4 / TN))) + (T3kon * Math.Pow(2.7, -v.t4 / TN));
+                d["{T4kon}"] = T4kon.ToString();
+
+                var t1kon = v.t1;
+                d["{t1kon}"] = t1kon.ToString();
+                var t1sr = t1kon / 2;
+                d["{t1sr}"] = t1sr.ToString();
+                var t2kon = v.t2 + t1kon;
+                d["{t2kon}"] = t2kon.ToString();
+                var t2sr = (t2kon + t1kon) / 2;
+                d["{t2sr}"] = t2sr.ToString();
+                var t3kon = v.t3 + t2kon;
+                d["{t3kon}"] = t3kon.ToString();
+                var t3sr = (t2kon + t3kon) / 2;
+                d["{t3sr}"] = t3sr.ToString();
+                var t4kon = t3kon + v.t4;
+                d["{t4kon}"] = t4kon.ToString();
+                var t4sr = (t4kon + t3kon) / 2;
+                d["{t4sr}"] = t4sr.ToString();
+
+                var T0 = TN * 2;
+                d["{T0}"] = T0.ToString();
+                var T01 = T0 * 1;
+                d["{T01}"] = T01.ToString();
+                var T02 = T0 * 2;
+                d["{T02}"] = T02.ToString();
+                var T03 = T0 * 3;
+                d["{T03}"] = T03.ToString();
+                var T04 = T0 * 4;
+                d["{T04}"] = T04.ToString();
+                var T05 = T0 * 5;
+                d["{T05}"] = T05.ToString();
+                
+                var Tohl1 = T4kon * Math.Pow(2.7, -T01 / T0);
+                d["{T1ohl}"] = Tohl1.ToString();
+                var Tohl2 = T4kon * Math.Pow(2.7, -T02 / T0);
+                d["{T2ohl}"] = Tohl2.ToString();
+                var Tohl3 = T4kon * Math.Pow(2.7, -T03 / T0);
+                d["{T3ohl}"] = Tohl3.ToString();
+                var Tohl4 = T4kon * Math.Pow(2.7, -T04 / T0);
+                d["{T4ohl}"] = Tohl4.ToString();
+                var Tohl5 = T4kon * Math.Pow(2.7, -T05 / T0);
+                d["{T5ohl}"] = Tohl5.ToString();
+
+                d["{aa1}"] = Tohl1.ToString();
+                d["{aa2}"] = Tohl2.ToString();
+                d["{aa3}"] = Tohl3.ToString();
+                d["{aa4}"] = Tohl4.ToString();
+                d["{aa5}"] = Tohl5.ToString();
+
 
 
 

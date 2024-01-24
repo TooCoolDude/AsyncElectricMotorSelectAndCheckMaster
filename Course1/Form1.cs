@@ -33,7 +33,7 @@ namespace CurseDeliverer
                 return;
             }
 
-            File.Copy("src\\Sample.docx", Directory.GetCurrentDirectory()+"\\Result.docx", true);
+            File.Copy("src\\Template.docx", Directory.GetCurrentDirectory()+"\\Result.docx", true);
 
             var replacements = await Calculator.GetVariablesAndValues(variant.First());
             DocumentInteractor.WriteChanges(Directory.GetCurrentDirectory()+"\\Result.docx", replacements);
