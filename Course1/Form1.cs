@@ -33,10 +33,10 @@ namespace CurseDeliverer
                 return;
             }
 
-            File.Copy("E:\\Curse1\\auto\\Sample.docx", "E:\\Curse1\\auto\\Result.docx", true);
+            File.Copy("src\\Sample.docx", Directory.GetCurrentDirectory()+"\\Result.docx", true);
 
             var replacements = await Calculator.GetVariablesAndValues(variant.First());
-            DocumentInteractor.WriteChanges("E:\\Curse1\\auto\\Result.docx", replacements);
+            DocumentInteractor.WriteChanges(Directory.GetCurrentDirectory()+"\\Result.docx", replacements);
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
