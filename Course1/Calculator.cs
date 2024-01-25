@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MotorSelectAndCheck;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -228,7 +229,15 @@ namespace CurseDeliverer
                 d["{aa4}"] = Tohl4.ToString();
                 d["{aa5}"] = Tohl5.ToString();
 
-
+                //График температуры
+                var chartLoader = new ChartLoader();
+                var points = new List<(double,double)>();
+                points.AddRange(new[] { 
+                    (0,0), (t1sr,T1sr), (t1kon,T1kon), (t2sr,T2sr), (t2kon,T2kon), 
+                    (t3sr,T3sr), (t3kon,T3kon), (t4sr,T4sr), (t4kon,T4kon),
+                    (T01,Tohl1), (T02,Tohl2), (T03,Tohl3), (T04,Tohl4), (T05,Tohl5)
+                });
+                await chartLoader.GetTemperatureChart(points);
 
 
                 break;

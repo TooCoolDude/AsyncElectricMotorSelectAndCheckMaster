@@ -1,5 +1,6 @@
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Packaging;
+using MotorSelectAndCheck;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,10 +34,16 @@ namespace CurseDeliverer
                 return;
             }
 
-            File.Copy("src\\Template.docx", Directory.GetCurrentDirectory()+"\\Result.docx", true);
+            //test
+            //var points = new List<(int, int)>();
+            //points.AddRange(new[] { (0, 0), (5, 5), (10, 5), (15, 0) });
+            //var chartLoader = new ChartLoader();
+            //await chartLoader.GetTemperatureChart(points);
 
-            var replacements = await Calculator.GetVariablesAndValues(variant.First());
-            DocumentInteractor.WriteChanges(Directory.GetCurrentDirectory()+"\\Result.docx", replacements);
+            File.Copy("src\\Template.docx", Directory.GetCurrentDirectory() + "\\Result.docx", true);
+
+            var replacements = Calculator.GetVariablesAndValues(variant.First());
+            DocumentInteractor.WriteChanges(Directory.GetCurrentDirectory() + "\\Result.docx", await replacements);
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
