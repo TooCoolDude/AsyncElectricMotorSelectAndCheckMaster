@@ -1,4 +1,5 @@
-﻿using MotorSelectAndCheck;
+﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using MotorSelectAndCheck;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -15,7 +16,6 @@ namespace CurseDeliverer
         {
             var d = new Dictionary<string, string>();
             CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("ru-RU");
-            //var c = CultureInfo.CurrentCulture;
             
             //Входные данные
             d["{variant1}"] = v.Variant[0].ToString();
@@ -94,6 +94,8 @@ namespace CurseDeliverer
 
                 var kpd0 = m.kpd / 100;
                 d["{kpd0}"] = kpd0.ToString();
+
+
                 //Проверка на нагрев методом средних потерь
                 var dPnom = m.P2nom * (1 - kpd0) / kpd0;
                 d["{dPnom}"] = dPnom.ToString();
@@ -240,11 +242,64 @@ namespace CurseDeliverer
                 await chartLoader.GetTemperatureChart(points);
 
 
+                //Метод эквивалентных величин
+                var wN = 157 * (1 - (m.sN / 100));
+                d["{wN}"] = wN.ToString();
+                var wK = 157 * (1 - (m.sK / 100));
+                d["{wK}"] = wK.ToString();
+                var Mm = Mnom * m.mM;
+                d["{Mm}"] = Mm.ToString();
+                double wM = 22;
+                var Mp = Mnom * m.mP;
+                d["{Mp}"] = Mp.ToString();
+
+                var Inom = m.P2nom * 1000 / (Math.Sqrt(3) * 380 * kpd0 * m.cosFi);
+                d["{Inom}"] = Inom.ToString();
+                var sinFi = Math.Sqrt(1 - Math.Pow(m.cosFi, 2));
+                d["{sinFi}"] = sinFi.ToString();
+                var Ip = m.ki * Inom;
+                d["{Ip}"] = Ip.ToString();
+                var Ik = 0.75 * Ip;
+                d["{Ik}"] = Ik.ToString();
+                var I0 = Inom * (sinFi - (m.cosFi / (2 * m.mK)));
+                d["{I0}"] = I0.ToString();
+
+
+                //Характеристики на графике
+
+
+
+                
                 break;
             }
-
+            
+            foreach (var key in d.Keys)
+            {
+                d[key] = ShortenStringNum(d[key]);
+            }
 
             return d;
         }
+
+        private static string ShortenStringNum(string s)
+        {
+            int pointPosition = 0;
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (s[i] == ',')
+                { 
+                    pointPosition = i;
+                    for (int j = 3; j > 0; j--)
+                    {
+                        if (pointPosition + j <= s.Length)
+                        { 
+                            return s.Substring(0, pointPosition + j);
+                        }
+                    }
+                }
+            }
+            return s;
+        }
+
     }
 }

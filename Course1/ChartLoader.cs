@@ -15,14 +15,6 @@ namespace MotorSelectAndCheck
     {
         public Task GetTemperatureChart(List<(double,double)> values)
         {
-            //HttpClient client = new HttpClient();
-            //var body = new StringContent("src\\body.json");
-            ////var content = new FormUrlEncodedContent(values);
-            //var response = await client.PostAsync("https://yotx.ru/", body);
-            //string generatedUrl = "!1/3_h/sH@xcH@0YM4X9t/2j/YP9g309Kre1vXPAudjdAvK0tyNbuBoy3s7W7sXXG29mBXOxu7Ozwdi4gF7sbO2e8nbPdjR0Eb@d0d39nn0TDbuycMh5PtxiPW5cXu/tb@1v7AA==";
-            //var responseContent = await response.Content.ReadAsStringAsync();
-            //string result = "https://yotx.ru/#" + generatedUrl;
-
             var chartForm = new ChartForm();
             chartForm.Show();
 
