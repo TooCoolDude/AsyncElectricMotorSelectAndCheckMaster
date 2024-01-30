@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using MathNet.Numerics;
 using MotorSelectAndCheck;
 using System;
 using System.Collections.Generic;
@@ -75,14 +76,16 @@ namespace CurseDeliverer
 
 
                 //Проверка на перегрузочную способность
-                var Mnom = m.P2nom * 1000 / (157 * (1 - (m.sN / 100)));
+                var w0 = 2 * Math.PI * m.n0 / 60;
+                d["{w0}"] = w0.ToString();
+                var Mnom = m.P2nom * 1000 / (w0 * (1 - (m.sN / 100)));
                 d["{Mnom}"] = Mnom.ToString();
                 var Mk = Mnom * m.mK;
                 d["{Mk}"] = Mk.ToString();
                 var Pmax = new[] { v.P1, v.P2, v.P3, v.P4 }.Max() * 1000;
                 d["{Pmax}"] = Pmax.ToString();
                 d["{PmaxK}"] = (Pmax / 1000).ToString();
-                var Msmax = Pmax / (157 * (1 - (m.sK / 100)));
+                var Msmax = Pmax / (w0 * (1 - (m.sK / 100)));
                 d["{Msmax}"] = Msmax.ToString();
                 var Mk09 = Mk * Math.Pow(1 - 0.1, 2);
                 d["{Mk09}"] = Mk09.ToString();
@@ -234,7 +237,8 @@ namespace CurseDeliverer
                 //График температуры
                 var chartLoader = new ChartLoader();
                 var points = new List<(double,double)>();
-                points.AddRange(new[] { 
+                points.AddRange(new[] 
+                { 
                     (0,0), (t1sr,T1sr), (t1kon,T1kon), (t2sr,T2sr), (t2kon,T2kon), 
                     (t3sr,T3sr), (t3kon,T3kon), (t4sr,T4sr), (t4kon,T4kon),
                     (T01,Tohl1), (T02,Tohl2), (T03,Tohl3), (T04,Tohl4), (T05,Tohl5)
@@ -243,13 +247,14 @@ namespace CurseDeliverer
 
 
                 //Метод эквивалентных величин
-                var wN = 157 * (1 - (m.sN / 100));
+                var wN = w0 * (1 - (m.sN / 100));
                 d["{wN}"] = wN.ToString();
-                var wK = 157 * (1 - (m.sK / 100));
+                var wK = w0 * (1 - (m.sK / 100));
                 d["{wK}"] = wK.ToString();
                 var Mm = Mnom * m.mM;
                 d["{Mm}"] = Mm.ToString();
-                double wM = 22;
+                var wM = w0 * (1 - 0.86);
+                d["{wM}"] = wM.ToString();
                 var Mp = Mnom * m.mP;
                 d["{Mp}"] = Mp.ToString();
 
@@ -266,10 +271,50 @@ namespace CurseDeliverer
 
 
                 //Характеристики на графике
+                var dw2 = ((int)w0) / 6 + (w0 % 6);
+                d["{dw2}"] = dw2.ToString();
+                var dw1 = ((int)w0) / 6;
+                d["{dw1}"] = dw1.ToString();
+                double w1 = dw1;
+                d["{w1}"] = dw1.ToString();
+                double w2 = w1 + dw1;
+                d["{w2}"] = w2.ToString();
+                double w3 = w2 + dw1;
+                d["{w3}"] = w3.ToString();
+                double w4 = w3 + dw1;
+                d["{w4}"] = w4.ToString();
+                double w5 = w4 + dw1;
+                d["{w5}"] = w5.ToString();
+                double w6 = w5 + dw2;
+                d["{w6}"] = w6.ToString();
 
+                var Mstatic = Mnom * 0.3;
+                d["{Mst}"] = Mstatic.ToString();
 
+                var MstList = new List<(double, double)>();
+                MstList.AddRange(new[]
+                {
+                    (Mstatic, 0.0), (Mstatic, w1), (Mstatic, w2), (Mstatic, w3), (Mstatic, w4), (Mstatic, w5), (Mstatic, w6)
+                });
 
-                
+                var MwList = new List<(double, double)>();
+                MwList.AddRange(new[]
+                {
+                    (0.0, w0), (Mnom, wN), (Mk, wK), (Mm, wM), (Mp, 0.0)
+                });
+
+                var IwList = new List<(double, double)>();
+                IwList.AddRange(new[]
+                {
+                    (I0, w0), (Inom, wN), (Ik, wK), (Ip, 0.0), 
+                });
+
+                var chartLoader2 = new ChartLoader();
+                await chartLoader2.GetCharacteristicsChart(
+                    MstList,
+                    GenerateInterpolatedPoints(MwList),
+                    GenerateInterpolatedPoints(IwList));
+
                 break;
             }
             
@@ -299,6 +344,43 @@ namespace CurseDeliverer
                 }
             }
             return s;
+        }
+
+        private static List<(double,double)> GenerateInterpolatedPoints(List<(double, double)> inputPoints, double step = 10)
+        {
+            var xValues = new List<double>();
+            var yValues = new List<double>();
+            var result = new List<(double,double)>();
+
+            foreach (var point in inputPoints)
+            {
+                xValues.Add(point.Item1);
+                yValues.Add(point.Item2);
+            }
+
+            var points = Interpolator.InterpolateXY(xValues.ToArray(), yValues.ToArray(), 500);
+
+            for (int i = 0; i < points.xs.Length; i++)
+            {
+                result.Add((points.xs[i], points.ys[i]));
+            }
+
+            return result;
+
+            //var interpolation = Interpolate.CubicSplineRobust(xValues, yValues);
+
+            //List<(double, double)> interpolatedPoints = new List<(double, double)>();
+
+            //double startX = xValues[0];
+            //double endX = xValues[xValues.Count - 1];
+
+            //for (double x = startX; x <= endX; x += step)
+            //{
+            //    double y = interpolation.Interpolate(x);
+            //    interpolatedPoints.Add((x, y));
+            //}
+
+            //return interpolatedPoints;
         }
 
     }
