@@ -66,7 +66,7 @@ namespace MotorSelectAndCheck
             var chartForm = new ChartForm();
             chartForm.Show();
 
-            var myModel = new PlotModel { Title = "Нагрузочная диаграмма работей машины P(t)" };
+            var myModel = new PlotModel { Title = "Нагрузочная диаграмма рабочей машины P(t)" };
 
             var series = new OxyPlot.Series.AreaSeries()
             {
