@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MotorSelectAndCheck
 {
-    public static class Interpolator
+    public static class NormalSplineInterpolator
     {
         /// <summary>
         /// Generate a smooth (interpolated) curve that follows the path of the given X/Y points

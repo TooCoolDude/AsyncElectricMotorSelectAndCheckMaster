@@ -48,7 +48,7 @@
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1584, 936);
+            ClientSize = new Size(1584, 939);
             Controls.Add(plotView1);
             Name = "ChartForm";
             StartPosition = FormStartPosition.CenterScreen;
