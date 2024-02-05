@@ -220,7 +220,7 @@ namespace MotorSelectAndCheck
             var seriesW6 = new OxyPlot.Series.LineSeries()
             {
                 MarkerType = MarkerType.Circle,
-                Title = "w6",
+                Title = "w уст",
                 InterpolationAlgorithm = InterpolationAlgorithms.CanonicalSpline,
                 Color = OxyColors.Black,
             };
@@ -249,7 +249,7 @@ namespace MotorSelectAndCheck
                 MarkerType = MarkerType.Circle,
                 Title = "Mдин",
                 InterpolationAlgorithm = InterpolationAlgorithms.CanonicalSpline,
-                Color = OxyColors.Orange,
+                Color = OxyColors.Blue,
             };
             seriesMdin.Points.AddRange(valuesMdin.Select(v => new DataPoint(v.Item1, v.Item2)).ToArray());
 

@@ -348,8 +348,8 @@ namespace CurseDeliverer
                 var wust = FindNearestPointByX(MwListInterpolated, Mstatic).Item2;
                 var w6Points = new[]
                 {
-                    (0.0, w6),
-                    (MwList.Select(x => x.Item1).Max() + 30, w6)
+                    (0.0, wust),
+                    (MwList.Select(x => x.Item1).Max() + 30, wust)
                 };
                 var wList = new List<(double, double)[]>();
                 wList.AddRange(new[] { w1Points, w2Points, w3Points, w4Points, w5Points, w6Points });
@@ -366,7 +366,7 @@ namespace CurseDeliverer
                 d["{I34}"] = I34.ToString();
                 var I35 = FindNearestPointByY(IwListInterpolated, w5).Item1;
                 d["{I35}"] = I35.ToString();
-                var I36 = FindNearestPointByY(IwListInterpolated, w6).Item1;
+                var I36 = FindNearestPointByY(IwListInterpolated, wust).Item1;
                 d["{I36}"] = I36.ToString();
                 
                 d["{M10}"] = Mp.ToString();
@@ -380,7 +380,7 @@ namespace CurseDeliverer
                 d["{M14}"] = M14.ToString();
                 var M15 = FindNearestPointByY(MwListInterpolated, w5).Item1;
                 d["{M15}"] = M15.ToString();
-                var M16 = FindNearestPointByY(MwListInterpolated, w6).Item1;
+                var M16 = FindNearestPointByY(MwListInterpolated, wust).Item1;
                 d["{M16}"] = M16.ToString();
 
                 var M40 = Mp - Mstatic;
@@ -467,11 +467,17 @@ namespace CurseDeliverer
                 if (KMxInom < IekvR)
                     continue;
 
+                //var MdinList = new List<(double, double)>();
+                //MdinList.AddRange(new[]
+                //{
+                //    (M40, 0.0), (M41, w1), (M42, w2), (M43, w3), (M44, w4), (M45, w5), (0.0, wust)
+                //});
                 var MdinList = new List<(double, double)>();
-                MdinList.AddRange(new[]
+                MdinList.AddRange(MwListInterpolated.Select(x =>
                 {
-                    (M40, 0.0), (M41, w1), (M42, w2), (M43, w3), (M44, w4), (M45, w5), (M46, w6), (0.0, wust)
-                });
+                    var newX = x.Item1 - Mstatic;
+                    return (newX, x.Item2);
+                }).Where(v => v.Item1 >= 0));
 
                 var chartLoader2 = new ChartLoader();
                 await chartLoader2.GetCharacteristicsChart(
@@ -540,7 +546,7 @@ namespace CurseDeliverer
             return nearestPoint.FirstOrDefault();
         }
 
-        private static string ShortenStringNum(string s)
+        private static string ShortenStringNum(string s) //переделать для чисел типа 0.001 , 0.0001 и т.д.
         {
             int pointPosition = 0;
             for (int i = 0; i < s.Length; i++)
