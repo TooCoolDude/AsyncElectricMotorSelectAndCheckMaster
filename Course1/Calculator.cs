@@ -52,12 +52,12 @@ namespace CurseDeliverer
             var form = new MotorSelectAndCheck.MotorCalculationForm();
             form.labelPras.Text = Pras.ToString();
 
-            //возможно перенести
             var motors = MotorReader.Read();
             foreach ( var m in motors.Where(x => x.P2nom > Pras))
             {
                 CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("ru-RU");
                 //Таблица хараактеристик электродвигателя
+                d["{motorName}"] = m.Type.ToString();
                 d["{P2nom}"] = m.P2nom.ToString();
                 d["{P2nomK}"] = (m.P2nom * 1000).ToString();
                 d["{n0}"] = m.n0.ToString();
@@ -346,6 +346,7 @@ namespace CurseDeliverer
                     (MwList.Select(x => x.Item1).Max() + 30, w5)
                 };
                 var wust = FindNearestPointByX(MwListInterpolated, Mstatic).Item2;
+                d["{wust}"] = wust.ToString();
                 var w6Points = new[]
                 {
                     (0.0, wust),
@@ -479,8 +480,7 @@ namespace CurseDeliverer
                     return (newX, x.Item2);
                 }).Where(v => v.Item1 >= 0));
 
-                var chartLoader2 = new ChartLoader();
-                await chartLoader2.GetCharacteristicsChart(
+                await chartLoader.GetCharacteristicsChart(
                 MstList,
                 MwListInterpolated,
                 IwListInterpolated,
@@ -496,14 +496,12 @@ namespace CurseDeliverer
                 var wtList = new List<(double, double)>();
                 wtList.AddRange(new[]
                 {
-                    (0.0, 0.0), (tp1, w1), (tp2, w2), (tp3, w3), (tp4, w4), (tp5, w5), (tp6, w6)
+                    (0.0, 0.0), (tp1, w1), (tp2, w2), (tp3, w3), (tp4, w4), (tp5, w5), (tp6, wust)
                 });
 
-                var chartloader3 = new ChartLoader();
-                await chartloader3.GetCharacteristicsChart2(ItList, wtList);
+                await chartLoader.GetCharacteristicsChart2(ItList, wtList);
 
-                var chartloader4 = new ChartLoader();
-                await chartloader4.GetPowerDiagram(v);
+                await chartLoader.GetPowerDiagram(v);
 
                 var currentDiagramPoints = new List<(double, double)>();
                 currentDiagramPoints.AddRange(new[]
@@ -513,10 +511,35 @@ namespace CurseDeliverer
                     (v.t3 + v.t2 + v.t1 + tpuska, Ii3), (v.t3 + v.t2 + v.t1 + tpuska, Ii4),
                     (v.t4 + v.t3 + v.t2 + v.t1 + tpuska, Ii4), (v.t4 + v.t3 + v.t2 + v.t1 + tpuska, 0.0)
                 });
-                var chartLoader5 = new ChartLoader();
-                await chartLoader5.GetCurrentDiagram(currentDiagramPoints);
+                await chartLoader.GetCurrentDiagram(currentDiagramPoints);
 
                 //Расчет и выбор автоматического выключателя
+                var switches = AEswitchReader.GetValues().Where(s=>s.CurrentValues.Max() >= Inom);
+                foreach (var s in switches)
+                {
+                    d["{AEselected}"] = s.Type;
+                    var aeMaxCurrent = s.CurrentValues.Max();
+                    d["{AEmaxCurrent}"] = aeMaxCurrent.ToString();
+                    
+                    foreach (var s2 in s.CurrentValues)
+                    {
+                        if (s2 < Inom)
+                            continue;
+                        d["{AEcurrentSelected}"] = s2.ToString();
+                        var AEteploCut = 1.25 * s2;
+                        d["{AEteploCut}"] = AEteploCut.ToString();
+                        var AEelmagCut = 12 * s2;
+                        d["{AEelmagCut}"] = AEelmagCut.ToString();
+                        var AEproveLeft = AEelmagCut * (1 - 0.15);
+                        d["{AEproveLeft}"] = AEproveLeft.ToString();
+                        var AEproveRight = Inom * m.ki * 1.15;
+                        d["{AEproveRight}"] = AEproveRight.ToString();
+                        if (AEproveLeft <= AEproveRight)
+                            continue;
+                        break;
+                    }
+                    break;
+                }
 
                 var Awork = ((v.P1 * v.t1 / kpd1) + (v.P2 * v.t2 / kpd2) + (v.P3 * v.t3 / kpd3) + (v.P4 * v.t4 / kpd4)) / 60;
                 d["{Awork}"] = Awork.ToString();

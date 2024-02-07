@@ -13,7 +13,7 @@ namespace CurseDeliverer
     {
         public static VariantValues[] GetVariants()
         {
-            var path = @"E:\Curse1\auto\Variants.xlsx";
+            var path = Directory.GetCurrentDirectory() + @"\src\Variants.xlsx";
             var workbook = ReoGridControl.CreateMemoryWorkbook();
             workbook.Load(path, FileFormat.Excel2007);
             var sheet1 = workbook.Worksheets[0];

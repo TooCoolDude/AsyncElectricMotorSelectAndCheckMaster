@@ -82,6 +82,54 @@ namespace CurseDeliverer
             {
                 FindAndReplace(wordApp, r.Key, r.Value);
             }
+
+            ReplaceImage(wordApp, aDoc, "{image1}", "\\src\\diagramPower.png");
+            ReplaceImage(wordApp, aDoc, "{image2}", "\\src\\temperature.png");
+            ReplaceImage(wordApp, aDoc, "{image3}", "\\src\\characteristics.png");
+            ReplaceImage(wordApp, aDoc, "{image4}", "\\src\\characteristics2.png");
+            ReplaceImage(wordApp, aDoc, "{image5}", "\\src\\diagramCurrent.png");
+        }
+
+        private static void ReplaceImage(Word.Application word, Word.Document doc, string pattern, string imagePath)
+        {
+            //var word = new Word.Application();
+            object missing = Type.Missing;
+            //object filename = "src\\Template.docx";
+
+            //var doc = word.Documents.Open(ref filename, ref missing, ref missing, ref missing, ref missing,
+            //    ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing,
+            //    ref missing, ref missing, ref missing, ref missing);
+
+            Word.Range range = word.ActiveDocument.Content;
+            Word.Find find = range.Find;
+
+            find.Text = pattern;
+            find.ClearFormatting();
+
+            if (find.Execute(ref missing, ref missing, ref missing, ref missing, ref missing,
+              ref missing, ref missing, ref missing, ref missing, ref missing,
+               ref missing, ref missing, ref missing, ref missing, ref missing))
+            {
+
+                var shape = range.InlineShapes.AddPicture(Directory.GetCurrentDirectory() + imagePath, ref missing, ref missing, ref missing);
+                shape.Width = 425;
+                shape.Height = 425;
+
+                find.Replacement.ClearFormatting();
+                find.Replacement.Text = "";
+                object replaceOne = Microsoft.Office.Interop.Word.WdReplace.wdReplaceOne;
+                find.Execute(ref missing, ref missing, ref missing, ref missing, ref missing,
+                   ref missing, ref missing, ref missing, ref missing, ref missing,
+                    ref replaceOne, ref missing, ref missing, ref missing, ref missing);
+
+
+                doc.Save();
+            }
+
+            else
+            {
+                MessageBox.Show("The text could not be located.");
+            }
         }
     }
 }

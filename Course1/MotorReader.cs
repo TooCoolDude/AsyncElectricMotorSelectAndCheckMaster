@@ -13,7 +13,7 @@ namespace CurseDeliverer
     {
         public static Motor[] Read()
         {
-            var path = @"E:\Curse1\auto\Motors.xlsx";
+            var path = Directory.GetCurrentDirectory() + @"\src\Motors.xlsx";
             var workbook = ReoGridControl.CreateMemoryWorkbook();
             workbook.Load(path, FileFormat.Excel2007);
             var sheet1 = workbook.Worksheets[0];

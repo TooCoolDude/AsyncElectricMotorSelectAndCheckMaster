@@ -56,7 +56,7 @@ namespace MotorSelectAndCheck
             myModel.Background = OxyColors.White;
 
             var pngExporter = new PngExporter { Width = 1650, Height = 1650 };
-            pngExporter.ExportToFile(myModel, "src\\diagramCurrent.png");
+            pngExporter.ExportToFile(myModel, Directory.GetCurrentDirectory() + "\\src\\diagramCurrent.png");
 
             return Task.CompletedTask;
         }
@@ -114,7 +114,7 @@ namespace MotorSelectAndCheck
             myModel.Background = OxyColors.White;
 
             var pngExporter = new PngExporter { Width = 1650, Height = 1650 };
-            pngExporter.ExportToFile(myModel, "src\\diagramPower.png");
+            pngExporter.ExportToFile(myModel, Directory.GetCurrentDirectory() + "\\src\\diagramPower.png");
 
             return Task.CompletedTask;
         }
@@ -160,7 +160,7 @@ namespace MotorSelectAndCheck
             myModel.Background = OxyColors.White;
 
             var pngExporter = new PngExporter { Width = 1650, Height = 1650 };
-            pngExporter.ExportToFile(myModel, "src\\temperature.png");
+            pngExporter.ExportToFile(myModel, Directory.GetCurrentDirectory() + "\\src\\temperature.png");
 
             return Task.CompletedTask;
         }
@@ -299,7 +299,7 @@ namespace MotorSelectAndCheck
             myModel.Background = OxyColors.White;
 
             var pngExporter = new PngExporter { Width = 1650, Height = 1650 };
-            pngExporter.ExportToFile(myModel, "src\\characteristics.png");
+            pngExporter.ExportToFile(myModel, Directory.GetCurrentDirectory() + "\\src\\characteristics.png");
 
             return Task.CompletedTask;
         }
@@ -380,7 +380,7 @@ namespace MotorSelectAndCheck
             myModel.Background = OxyColors.White;
 
             var pngExporter = new PngExporter { Width = 1650, Height = 1650 };
-            pngExporter.ExportToFile(myModel, "src\\characteristics2.png");
+            pngExporter.ExportToFile(myModel, Directory.GetCurrentDirectory() + "\\src\\characteristics2.png");
 
             return Task.CompletedTask;
         }

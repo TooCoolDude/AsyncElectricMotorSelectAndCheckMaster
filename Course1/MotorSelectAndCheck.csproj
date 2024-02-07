@@ -26,6 +26,9 @@
     <PackageReference Include="unvell.ReoGrid.dll" Version="3.0.0" />
   </ItemGroup>
 	<ItemGroup>
+	  <None Update="src\AEswitches.xlsx">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="src\Motors.xlsx">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
