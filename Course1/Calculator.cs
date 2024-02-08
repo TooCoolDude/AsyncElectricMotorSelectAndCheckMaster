@@ -52,7 +52,7 @@ namespace CurseDeliverer
             var form = new MotorSelectAndCheck.MotorCalculationForm();
             form.labelPras.Text = Pras.ToString();
 
-            var motors = MotorReader.Read();
+            var motors = MotorReader.Read().OrderBy(x=>x.P2nom);
             foreach ( var m in motors.Where(x => x.P2nom > Pras))
             {
                 CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("ru-RU");
@@ -92,8 +92,6 @@ namespace CurseDeliverer
                 
                 if (Mk09 < Msmax)
                     continue;
-                //if (m.P2nom < 23)
-                //    continue;
 
                 var kpd0 = m.kpd / 100;
                 d["{kpd0}"] = kpd0.ToString();
@@ -273,7 +271,7 @@ namespace CurseDeliverer
                 //Характеристики на графике
                 var dw2 = ((int)w0) / 6 + (w0 % 6);
                 d["{dw2}"] = dw2.ToString();
-                int dw1 = 25; //((int)w0) / 6;
+                int dw1 = 25;
                 d["{dw1}"] = dw1.ToString();
                 double w1 = dw1;
                 d["{w1}"] = dw1.ToString();
