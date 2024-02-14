@@ -63,7 +63,6 @@ namespace CurseDeliverer
             object replace = 2;
             object wrap = 1;
 
-            //execute find and replace
             doc.Selection.Find.Execute(ref findText, ref matchCase, ref matchWholeWord,
                 ref matchWildCards, ref matchSoundsLike, ref matchAllWordForms, ref forward, ref wrap, ref format, ref replaceWithText, ref replace,
                 ref matchKashida, ref matchDiacritics, ref matchAlefHamza, ref matchControl);
@@ -92,13 +91,7 @@ namespace CurseDeliverer
 
         private static void ReplaceImage(Word.Application word, Word.Document doc, string pattern, string imagePath)
         {
-            //var word = new Word.Application();
             object missing = Type.Missing;
-            //object filename = "src\\Template.docx";
-
-            //var doc = word.Documents.Open(ref filename, ref missing, ref missing, ref missing, ref missing,
-            //    ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing,
-            //    ref missing, ref missing, ref missing, ref missing);
 
             Word.Range range = word.ActiveDocument.Content;
             Word.Find find = range.Find;

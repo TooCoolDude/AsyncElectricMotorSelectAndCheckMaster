@@ -52,7 +52,7 @@
             Controls.Add(plotView1);
             Name = "ChartForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "ChartForm";
+            Text = "График";
             ResumeLayout(false);
         }
 

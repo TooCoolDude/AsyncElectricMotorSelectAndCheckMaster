@@ -300,21 +300,13 @@ namespace CurseDeliverer
                 {//Некоторые точки дублируются, чтобы работал CatmullRomInterpolator
                     (0.0, w0), (0.0, w0), (Mnom, wN), (Mk, wK), (Mm, wM), (Mp, 0.0), (Mp, 0.0)
                 });
-                //{
-                //    (0.0, w0), (Mnom, wN), (Mk, wK), (Mm, wM), (Mp, 0.0)
-                //});
 
                 var IwList = new List<(double, double)>();
                 IwList.AddRange(new[]
                 {//Некоторые точки дублируются, чтобы работал CatmullRomInterpolator
                     (I0, w0), (I0, w0), (Inom, wN), (Ik, wK), (Ip, 0.0), (Ip, 0.0)
                 });
-                //{
-                //    (I0, w0), (Inom, wN), (Ik, wK), (Ip, 0.0)
-                //});
 
-                //var MwListInterpolated = GenerateInterpolatedPoints(MwList);
-                //var IwListInterpolated = GenerateInterpolatedPoints(IwList);
                 var MwListInterpolated = CatmullRomSpline.Generate(MwList.ToArray(), 1000).ToList();
                 var IwListInterpolated = CatmullRomSpline.Generate(IwList.ToArray(), 1000).ToList();
 
@@ -466,11 +458,6 @@ namespace CurseDeliverer
                 if (KMxInom < IekvR)
                     continue;
 
-                //var MdinList = new List<(double, double)>();
-                //MdinList.AddRange(new[]
-                //{
-                //    (M40, 0.0), (M41, w1), (M42, w2), (M43, w3), (M44, w4), (M45, w5), (0.0, wust)
-                //});
                 var MdinList = new List<(double, double)>();
                 MdinList.AddRange(MwListInterpolated.Select(x =>
                 {
@@ -585,28 +572,6 @@ namespace CurseDeliverer
                 }
             }
             return s;
-        }
-
-        private static List<(double,double)> GenerateInterpolatedPoints(List<(double, double)> inputPoints, double step = 10)
-        {
-            var xValues = new List<double>();
-            var yValues = new List<double>();
-            var result = new List<(double,double)>();
-
-            foreach (var point in inputPoints)
-            {
-                xValues.Add(point.Item1);
-                yValues.Add(point.Item2);
-            }
-
-            var points = NormalSplineInterpolator.InterpolateXY(xValues.ToArray(), yValues.ToArray(), 1000); //1000 - плотность точек графика
-
-            for (int i = 0; i < points.xs.Length; i++)
-            {
-                result.Add((points.xs[i], points.ys[i]));
-            }
-
-            return result;
         }
     }
 }
