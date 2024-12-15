@@ -26,15 +26,16 @@ namespace CurseDeliverer
                 {
                     var variant = new VariantValues
                         (
-                            Variant: (i-3).ToString()+(j-3).ToString(),
+                            Variant1: (i-3).ToString(),
+                            Variant2: (j-3).ToString(),
                             P1: sheet1.GetCellData<double>("B" + i), 
                             P2: sheet1.GetCellData<double>("C" + i),
                             P3: sheet1.GetCellData<double>("D" + i),
                             P4: sheet1.GetCellData<double>("E" + i),
-                            t1: sheet1.GetCellData<double>("G" + i),
-                            t2: sheet1.GetCellData<double>("H" + i),
-                            t3: sheet1.GetCellData<double>("I" + i),
-                            t4: sheet1.GetCellData<double>("J" + i)
+                            t1: sheet1.GetCellData<double>("G" + j),
+                            t2: sheet1.GetCellData<double>("H" + j),
+                            t3: sheet1.GetCellData<double>("I" + j),
+                            t4: sheet1.GetCellData<double>("J" + j)
                         );
 
                     variants.Add(variant);

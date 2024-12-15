@@ -19,8 +19,8 @@ namespace CurseDeliverer
             CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("ru-RU");
             
             //Входные данные
-            d["{variant1}"] = v.Variant[0].ToString();
-            d["{variant2}"] = v.Variant[1].ToString();
+            d["{variant1}"] = v.Variant1.ToString();
+            d["{variant2}"] = v.Variant2.ToString();
             d["{P1}"] = v.P1.ToString();
             d["{P2}"] = v.P2.ToString();
             d["{P3}"] = v.P3.ToString();

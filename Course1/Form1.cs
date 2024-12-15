@@ -27,7 +27,7 @@ namespace CurseDeliverer
         {
             variants = VariantReader.GetVariants();
 
-            var variant = variants.Where(x => x.Variant == textBox1.Text);
+            var variant = variants.Where(x => x.Variant1 == textBox1.Text && x.Variant2 == textBox2.Text);
             if (variant.Count() < 1)
             {
                 textBox1.Text = "wrong";
@@ -47,6 +47,11 @@ namespace CurseDeliverer
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
         {
 
         }
